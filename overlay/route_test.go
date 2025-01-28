@@ -19,7 +19,7 @@ func Test_parseRoutes(t *testing.T) {
 	// test no routes config
 	routes, err := parseRoutes(c, n)
 	assert.Nil(t, err)
-	assert.Len(t, routes, 0)
+	assert.Empty(t, routes)
 
 	// not an array
 	c.Settings["tun"] = map[interface{}]interface{}{"routes": "hi"}
@@ -31,7 +31,7 @@ func Test_parseRoutes(t *testing.T) {
 	c.Settings["tun"] = map[interface{}]interface{}{"routes": []interface{}{}}
 	routes, err = parseRoutes(c, n)
 	assert.Nil(t, err)
-	assert.Len(t, routes, 0)
+	assert.Empty(t, routes)
 
 	// weird route
 	c.Settings["tun"] = map[interface{}]interface{}{"routes": []interface{}{"asdf"}}
@@ -118,7 +118,7 @@ func Test_parseUnsafeRoutes(t *testing.T) {
 	// test no routes config
 	routes, err := parseUnsafeRoutes(c, n)
 	assert.Nil(t, err)
-	assert.Len(t, routes, 0)
+	assert.Empty(t, routes)
 
 	// not an array
 	c.Settings["tun"] = map[interface{}]interface{}{"unsafe_routes": "hi"}
@@ -130,7 +130,7 @@ func Test_parseUnsafeRoutes(t *testing.T) {
 	c.Settings["tun"] = map[interface{}]interface{}{"unsafe_routes": []interface{}{}}
 	routes, err = parseUnsafeRoutes(c, n)
 	assert.Nil(t, err)
-	assert.Len(t, routes, 0)
+	assert.Empty(t, routes)
 
 	// weird route
 	c.Settings["tun"] = map[interface{}]interface{}{"unsafe_routes": []interface{}{"asdf"}}
