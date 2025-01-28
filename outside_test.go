@@ -53,7 +53,7 @@ func Test_newPacket(t *testing.T) {
 	b = append(b, []byte{0, 3, 0, 4}...)
 	err = newPacket(b, true, p)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, p.Protocol, uint8(firewall.ProtoTCP))
 	assert.Equal(t, p.LocalIP, netip.MustParseAddr("10.0.0.2"))
 	assert.Equal(t, p.RemoteIP, netip.MustParseAddr("10.0.0.1"))
@@ -74,7 +74,7 @@ func Test_newPacket(t *testing.T) {
 	b = append(b, []byte{0, 5, 0, 6}...)
 	err = newPacket(b, false, p)
 
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, p.Protocol, uint8(2))
 	assert.Equal(t, p.LocalIP, netip.MustParseAddr("10.0.0.1"))
 	assert.Equal(t, p.RemoteIP, netip.MustParseAddr("10.0.0.2"))

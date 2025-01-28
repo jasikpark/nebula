@@ -80,12 +80,12 @@ IBNWYMep3ysx9zCgknfG5dKtwGTaqF++BWKDYdyl34KX
 	}
 
 	p, err := NewCAPoolFromPEM([]byte(noNewLines))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, p.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Certificate.Name(), rootCA.details.Name)
 	assert.Equal(t, p.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Certificate.Name(), rootCA01.details.Name)
 
 	pp, err := NewCAPoolFromPEM([]byte(withNewLines))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, pp.CAs[string("c9bfaf7ce8e84b2eeda2e27b469f4b9617bde192efd214b68891ecda6ed49522")].Certificate.Name(), rootCA.details.Name)
 	assert.Equal(t, pp.CAs[string("5c9c3f23e7ee7fe97637cbd3a0a5b854154d1d9aaaf7b566a51f4a88f76b64cd")].Certificate.Name(), rootCA01.details.Name)
 
@@ -103,7 +103,7 @@ IBNWYMep3ysx9zCgknfG5dKtwGTaqF++BWKDYdyl34KX
 	assert.Equal(t, len(pppp.CAs), 3)
 
 	ppppp, err := NewCAPoolFromPEM([]byte(p256))
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, ppppp.CAs[string("a7938893ec8c4ef769b06d7f425e5e46f7a7f5ffa49c3bcf4a86b608caba9159")].Certificate.Name(), rootCAP256.details.Name)
 	assert.Equal(t, len(ppppp.CAs), 1)
 }

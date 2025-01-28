@@ -39,12 +39,12 @@ func TestNewLhQuery(t *testing.T) {
 
 	// It should also Marshal fine
 	b, err := a.Marshal()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// and then Unmarshal fine
 	n := &NebulaMeta{}
 	err = n.Unmarshal(b)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 }
 
@@ -57,7 +57,7 @@ func Test_lhStaticMapping(t *testing.T) {
 	c.Settings["lighthouse"] = map[interface{}]interface{}{"hosts": []interface{}{lh1}}
 	c.Settings["static_host_map"] = map[interface{}]interface{}{lh1: []interface{}{"1.1.1.1:4242"}}
 	_, err := NewLightHouseFromConfig(context.Background(), l, c, myVpnNet, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	lh2 := "10.128.0.3"
 	c = config.NewC(l)

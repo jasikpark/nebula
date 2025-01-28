@@ -44,11 +44,11 @@ func TestMarshalingNebulaCertificate(t *testing.T) {
 	}
 
 	b, err := nc.Marshal()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	//t.Log("Cert size:", len(b))
 
 	nc2, err := unmarshalCertificateV1(b, true)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, nc.signature, nc2.Signature())
 	assert.Equal(t, nc.details.Name, nc2.Name())
@@ -186,7 +186,7 @@ func TestNebulaCertificate_MarshalJSON(t *testing.T) {
 	}
 
 	b, err := nc.MarshalJSON()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.JSONEq(
 		t,
 		"{\"details\":{\"curve\":\"CURVE25519\",\"groups\":[\"test-group1\",\"test-group2\",\"test-group3\"],\"ips\":[\"10.1.1.1/24\",\"10.1.1.2/16\"],\"isCa\":false,\"issuer\":\"1234567890abcedfghij1234567890ab\",\"name\":\"testing\",\"notAfter\":\"0000-11-30T02:00:00Z\",\"notBefore\":\"0000-11-30T01:00:00Z\",\"publicKey\":\"313233343536373839306162636564666768696a313233343536373839306162\",\"subnets\":[\"9.1.1.2/24\",\"9.1.1.3/16\"]},\"fingerprint\":\"3944c53d4267a229295b56cb2d27d459164c010ac97d655063ba421e0670f4ba\",\"signature\":\"313233343536373839306162636564666768696a313233343536373839306162\"}",
@@ -196,16 +196,16 @@ func TestNebulaCertificate_MarshalJSON(t *testing.T) {
 
 func TestNebulaCertificate_Verify(t *testing.T) {
 	ca, _, caKey, err := newTestCaCert(time.Now(), time.Now().Add(10*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	c, _, _, err := newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool := NewCAPool()
 	assert.NoError(t, caPool.AddCA(ca))
 
 	f, err := c.Fingerprint()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	caPool.BlocklistFingerprint(f)
 
 	_, err = caPool.VerifyCertificate(time.Now(), c)
@@ -213,7 +213,7 @@ func TestNebulaCertificate_Verify(t *testing.T) {
 
 	caPool.ResetCertBlocklist()
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = caPool.VerifyCertificate(time.Now().Add(time.Hour*1000), c)
 	assert.EqualError(t, err, "root certificate is expired")
@@ -223,10 +223,10 @@ func TestNebulaCertificate_Verify(t *testing.T) {
 
 	// Test group assertion
 	ca, _, caKey, err = newTestCaCert(time.Now(), time.Now().Add(10*time.Minute), nil, nil, []string{"test1", "test2"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPem, err := ca.MarshalPEM()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool = NewCAPool()
 	b, err := caPool.AddCAFromPEM(caPem)
@@ -237,23 +237,23 @@ func TestNebulaCertificate_Verify(t *testing.T) {
 	assert.EqualError(t, err, "certificate contained a group not present on the signing ca: bad")
 
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, nil, []string{"test1"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestNebulaCertificate_VerifyP256(t *testing.T) {
 	ca, _, caKey, err := newTestCaCertP256(time.Now(), time.Now().Add(10*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	c, _, _, err := newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool := NewCAPool()
 	assert.NoError(t, caPool.AddCA(ca))
 
 	f, err := c.Fingerprint()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	caPool.BlocklistFingerprint(f)
 
 	_, err = caPool.VerifyCertificate(time.Now(), c)
@@ -261,7 +261,7 @@ func TestNebulaCertificate_VerifyP256(t *testing.T) {
 
 	caPool.ResetCertBlocklist()
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, err = caPool.VerifyCertificate(time.Now().Add(time.Hour*1000), c)
 	assert.EqualError(t, err, "root certificate is expired")
@@ -271,10 +271,10 @@ func TestNebulaCertificate_VerifyP256(t *testing.T) {
 
 	// Test group assertion
 	ca, _, caKey, err = newTestCaCertP256(time.Now(), time.Now().Add(10*time.Minute), nil, nil, []string{"test1", "test2"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPem, err := ca.MarshalPEM()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool = NewCAPool()
 	b, err := caPool.AddCAFromPEM(caPem)
@@ -285,19 +285,19 @@ func TestNebulaCertificate_VerifyP256(t *testing.T) {
 	assert.EqualError(t, err, "certificate contained a group not present on the signing ca: bad")
 
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, nil, []string{"test1"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestNebulaCertificate_Verify_IPs(t *testing.T) {
 	caIp1 := mustParsePrefixUnmapped("10.0.0.0/16")
 	caIp2 := mustParsePrefixUnmapped("192.168.0.0/24")
 	ca, _, caKey, err := newTestCaCert(time.Now(), time.Now().Add(10*time.Minute), []netip.Prefix{caIp1, caIp2}, nil, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPem, err := ca.MarshalPEM()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool := NewCAPool()
 	b, err := caPool.AddCAFromPEM(caPem)
@@ -332,37 +332,37 @@ func TestNebulaCertificate_Verify_IPs(t *testing.T) {
 	cIp1 = mustParsePrefixUnmapped("10.0.1.0/16")
 	cIp2 = mustParsePrefixUnmapped("192.168.0.1/25")
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), []netip.Prefix{cIp1, cIp2}, nil, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), []netip.Prefix{caIp1, caIp2}, nil, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches reversed
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), []netip.Prefix{caIp2, caIp1}, nil, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches reversed with just 1
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), []netip.Prefix{caIp1}, nil, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestNebulaCertificate_Verify_Subnets(t *testing.T) {
 	caIp1 := mustParsePrefixUnmapped("10.0.0.0/16")
 	caIp2 := mustParsePrefixUnmapped("192.168.0.0/24")
 	ca, _, caKey, err := newTestCaCert(time.Now(), time.Now().Add(10*time.Minute), nil, []netip.Prefix{caIp1, caIp2}, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPem, err := ca.MarshalPEM()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	caPool := NewCAPool()
 	b, err := caPool.AddCAFromPEM(caPem)
@@ -397,67 +397,67 @@ func TestNebulaCertificate_Verify_Subnets(t *testing.T) {
 	cIp1 = mustParsePrefixUnmapped("10.0.1.0/16")
 	cIp2 = mustParsePrefixUnmapped("192.168.0.1/25")
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, []netip.Prefix{cIp1, cIp2}, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, []netip.Prefix{caIp1, caIp2}, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches reversed
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, []netip.Prefix{caIp2, caIp1}, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	// Exact matches reversed with just 1
 	c, _, _, err = newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, []netip.Prefix{caIp1}, []string{"test"})
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	_, err = caPool.VerifyCertificate(time.Now(), c)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestNebulaCertificate_VerifyPrivateKey(t *testing.T) {
 	ca, _, caKey, err := newTestCaCert(time.Time{}, time.Time{}, nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	err = ca.VerifyPrivateKey(Curve_CURVE25519, caKey)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, _, caKey2, err := newTestCaCert(time.Time{}, time.Time{}, nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	err = ca.VerifyPrivateKey(Curve_CURVE25519, caKey2)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	c, _, priv, err := newTestCert(ca, caKey, time.Time{}, time.Time{}, nil, nil, nil)
 	err = c.VerifyPrivateKey(Curve_CURVE25519, priv)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, priv2 := x25519Keypair()
 	err = c.VerifyPrivateKey(Curve_CURVE25519, priv2)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func TestNebulaCertificate_VerifyPrivateKeyP256(t *testing.T) {
 	ca, _, caKey, err := newTestCaCertP256(time.Time{}, time.Time{}, nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	err = ca.VerifyPrivateKey(Curve_P256, caKey)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, _, caKey2, err := newTestCaCertP256(time.Time{}, time.Time{}, nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	err = ca.VerifyPrivateKey(Curve_P256, caKey2)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 
 	c, _, priv, err := newTestCert(ca, caKey, time.Time{}, time.Time{}, nil, nil, nil)
 	err = c.VerifyPrivateKey(Curve_P256, priv)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	_, priv2 := p256Keypair()
 	err = c.VerifyPrivateKey(Curve_P256, priv2)
-	assert.NotNil(t, err)
+	assert.Error(t, err)
 }
 
 func appendByteSlices(b ...[]byte) []byte {
@@ -514,10 +514,10 @@ func appendByteSlices(b ...[]byte) []byte {
 
 func TestNebulaCertificate_Copy(t *testing.T) {
 	ca, _, caKey, err := newTestCaCert(time.Now(), time.Now().Add(10*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	c, _, _, err := newTestCert(ca, caKey, time.Now(), time.Now().Add(5*time.Minute), nil, nil, nil)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	cc := c.Copy()
 
 	test.AssertDeepCopyEqual(t, c, cc)

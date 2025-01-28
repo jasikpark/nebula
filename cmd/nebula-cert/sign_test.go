@@ -105,7 +105,7 @@ func Test_signCert(t *testing.T) {
 	ob.Reset()
 	eb.Reset()
 	caKeyF, err := os.CreateTemp("", "sign-cert.key")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(caKeyF.Name())
 
 	args = []string{"-ca-crt", "./nope", "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", "nope", "-out-key", "nope", "-duration", "100m"}
@@ -129,7 +129,7 @@ func Test_signCert(t *testing.T) {
 	ob.Reset()
 	eb.Reset()
 	caCrtF, err := os.CreateTemp("", "sign-cert.crt")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(caCrtF.Name())
 
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", "nope", "-out-key", "nope", "-duration", "100m"}
@@ -152,7 +152,7 @@ func Test_signCert(t *testing.T) {
 	ob.Reset()
 	eb.Reset()
 	inPubF, err := os.CreateTemp("", "in.pub")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(inPubF.Name())
 
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", "nope", "-in-pub", inPubF.Name(), "-duration", "100m"}
@@ -199,7 +199,7 @@ func Test_signCert(t *testing.T) {
 	// mismatched ca key
 	_, caPriv2, _ := ed25519.GenerateKey(rand.Reader)
 	caKeyF2, err := os.CreateTemp("", "sign-cert-2.key")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(caKeyF2.Name())
 	caKeyF2.Write(cert.MarshalSigningPrivateKeyToPEM(cert.Curve_CURVE25519, caPriv2))
 
@@ -220,7 +220,7 @@ func Test_signCert(t *testing.T) {
 
 	// create temp key file
 	keyF, err := os.CreateTemp("", "test.key")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	os.Remove(keyF.Name())
 
 	// failed cert write
@@ -234,14 +234,14 @@ func Test_signCert(t *testing.T) {
 
 	// create temp cert file
 	crtF, err := os.CreateTemp("", "test.crt")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	os.Remove(crtF.Name())
 
 	// test proper cert with removed empty groups and subnets
 	ob.Reset()
 	eb.Reset()
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", crtF.Name(), "-out-key", keyF.Name(), "-duration", "100m", "-subnets", "10.1.1.1/32, ,   10.2.2.2/32   ,   ,  ,, 10.5.5.5/32", "-groups", "1,,   2    ,        ,,,3,4,5"}
-	assert.Nil(t, signCert(args, ob, eb, nopw))
+	assert.NoError(t, signCert(args, ob, eb, nopw))
 	assert.Empty(t, ob.String())
 	assert.Empty(t, eb.String())
 
@@ -250,13 +250,13 @@ func Test_signCert(t *testing.T) {
 	lKey, b, curve, err := cert.UnmarshalPrivateKeyFromPEM(rb)
 	assert.Equal(t, cert.Curve_CURVE25519, curve)
 	assert.Empty(t, b)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Len(t, lKey, 32)
 
 	rb, _ = os.ReadFile(crtF.Name())
 	lCrt, b, err := cert.UnmarshalCertificateFromPEM(rb)
 	assert.Empty(t, b)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "test", lCrt.Name())
 	assert.Equal(t, "1.1.1.1/24", lCrt.Networks()[0].String())
@@ -284,7 +284,7 @@ func Test_signCert(t *testing.T) {
 	ob.Reset()
 	eb.Reset()
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", crtF.Name(), "-in-pub", inPubF.Name(), "-duration", "100m", "-groups", "1"}
-	assert.Nil(t, signCert(args, ob, eb, nopw))
+	assert.NoError(t, signCert(args, ob, eb, nopw))
 	assert.Empty(t, ob.String())
 	assert.Empty(t, eb.String())
 
@@ -292,7 +292,7 @@ func Test_signCert(t *testing.T) {
 	rb, _ = os.ReadFile(crtF.Name())
 	lCrt, b, err = cert.UnmarshalCertificateFromPEM(rb)
 	assert.Empty(t, b)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, lCrt.PublicKey(), inPub)
 
 	// test refuse to sign cert with duration beyond root
@@ -309,7 +309,7 @@ func Test_signCert(t *testing.T) {
 	os.Remove(keyF.Name())
 	os.Remove(crtF.Name())
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", crtF.Name(), "-out-key", keyF.Name(), "-duration", "100m", "-subnets", "10.1.1.1/32, ,   10.2.2.2/32   ,   ,  ,, 10.5.5.5/32", "-groups", "1,,   2    ,        ,,,3,4,5"}
-	assert.Nil(t, signCert(args, ob, eb, nopw))
+	assert.NoError(t, signCert(args, ob, eb, nopw))
 
 	// test that we won't overwrite existing key file
 	os.Remove(crtF.Name())
@@ -324,7 +324,7 @@ func Test_signCert(t *testing.T) {
 	os.Remove(keyF.Name())
 	os.Remove(crtF.Name())
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", crtF.Name(), "-out-key", keyF.Name(), "-duration", "100m", "-subnets", "10.1.1.1/32, ,   10.2.2.2/32   ,   ,  ,, 10.5.5.5/32", "-groups", "1,,   2    ,        ,,,3,4,5"}
-	assert.Nil(t, signCert(args, ob, eb, nopw))
+	assert.NoError(t, signCert(args, ob, eb, nopw))
 
 	// test that we won't overwrite existing certificate file
 	os.Remove(keyF.Name())
@@ -344,11 +344,11 @@ func Test_signCert(t *testing.T) {
 	eb.Reset()
 
 	caKeyF, err = os.CreateTemp("", "sign-cert.key")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(caKeyF.Name())
 
 	caCrtF, err = os.CreateTemp("", "sign-cert.crt")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	defer os.Remove(caCrtF.Name())
 
 	// generate the encrypted key
@@ -363,7 +363,7 @@ func Test_signCert(t *testing.T) {
 
 	// test with the proper password
 	args = []string{"-ca-crt", caCrtF.Name(), "-ca-key", caKeyF.Name(), "-name", "test", "-ip", "1.1.1.1/24", "-out-crt", crtF.Name(), "-out-key", keyF.Name(), "-duration", "100m", "-subnets", "10.1.1.1/32, ,   10.2.2.2/32   ,   ,  ,, 10.5.5.5/32", "-groups", "1,,   2    ,        ,,,3,4,5"}
-	assert.Nil(t, signCert(args, ob, eb, testpw))
+	assert.NoError(t, signCert(args, ob, eb, testpw))
 	assert.Equal(t, "Enter passphrase: ", ob.String())
 	assert.Empty(t, eb.String())
 
