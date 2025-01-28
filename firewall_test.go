@@ -352,7 +352,7 @@ func TestFirewall_Drop2(t *testing.T) {
 	cp := cert.NewCAPool()
 
 	// h1/c1 lacks the proper groups
-	assert.Error(t, fw.Drop(p, true, &h1, cp, nil), ErrNoMatchingRule)
+	assert.ErrorIs(t, fw.Drop(p, true, &h1, cp, nil), ErrInvalidRemoteIP)
 	// c has the proper groups
 	resetConntrack(fw)
 	assert.NoError(t, fw.Drop(p, true, &h, cp, nil))
