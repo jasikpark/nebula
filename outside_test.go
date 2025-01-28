@@ -57,8 +57,8 @@ func Test_newPacket(t *testing.T) {
 	assert.Equal(t, p.Protocol, uint8(firewall.ProtoTCP))
 	assert.Equal(t, p.LocalIP, netip.MustParseAddr("10.0.0.2"))
 	assert.Equal(t, p.RemoteIP, netip.MustParseAddr("10.0.0.1"))
-	assert.Equal(t, p.RemotePort, uint16(3))
-	assert.Equal(t, p.LocalPort, uint16(4))
+	assert.Equal(t, uint16(3), p.RemotePort)
+	assert.Equal(t, uint16(4), p.LocalPort)
 
 	// account for variable ip header length - outgoing
 	h = ipv4.Header{
@@ -75,9 +75,9 @@ func Test_newPacket(t *testing.T) {
 	err = newPacket(b, false, p)
 
 	assert.NoError(t, err)
-	assert.Equal(t, p.Protocol, uint8(2))
+	assert.Equal(t, uint8(2), p.Protocol)
 	assert.Equal(t, p.LocalIP, netip.MustParseAddr("10.0.0.1"))
 	assert.Equal(t, p.RemoteIP, netip.MustParseAddr("10.0.0.2"))
-	assert.Equal(t, p.RemotePort, uint16(6))
-	assert.Equal(t, p.LocalPort, uint16(5))
+	assert.Equal(t, uint16(6), p.RemotePort)
+	assert.Equal(t, uint16(5), p.LocalPort)
 }
